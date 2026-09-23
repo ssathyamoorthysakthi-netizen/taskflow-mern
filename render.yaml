@@ -1,0 +1,25 @@
+# Render Blueprint — TaskFlow API
+# Import this repo in Render and it will auto-create the service.
+# You still need to set MONGO_URI (MongoDB Atlas connection string) after provisioning.
+
+services:
+  - type: web
+    name: taskflow-api
+    runtime: node
+    rootDir: server
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: 22.20.0
+      - key: MONGO_URI
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRE
+        value: 30d
+      - key: CLIENT_URL
+        value: https://your-frontend.vercel.app

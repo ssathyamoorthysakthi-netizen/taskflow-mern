@@ -1,0 +1,42 @@
+require('dotenv').config();
+const express = require('express');
+const cors = require('cors');
+const connectDB = require('./config/db');
+const { notFound, errorHandler } = require('./middleware/errorHandler');
+
+const authRoutes = require('./routes/authRoutes');
+const taskRoutes = require('./routes/taskRoutes');
+const adminRoutes = require('./routes/adminRoutes');
+
+connectDB();
+
+const app = express();
+
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL ? process.env.CLIENT_URL.split(',').map((o) => o.trim()) : true,
+  })
+);
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+app.get('/api', (req, res) => {
+  res.json({ message: 'Welcome to TaskFlow API', version: '1.0.0' });
+});
+
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', uptime: process.uptime() });
+});
+
+app.use('/api/auth', authRoutes);
+app.use('/api/tasks', taskRoutes);
+app.use('/api/admin', adminRoutes);
+
+app.use(notFound);
+app.use(errorHandler);
+
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+  console.log(`TaskFlow server running on port ${PORT}`);
+});
