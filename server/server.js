@@ -36,15 +36,23 @@ app.use(errorHandler);
 const PORT = process.env.PORT || 5000;
 
 const start = async () => {
-  try {
-    await connectDB();
-    app.listen(PORT, () => {
-      console.log(`TaskFlow server running on port ${PORT}`);
-    });
-  } catch (error) {
-    console.error(`Failed to start server: ${error.message}`);
-    process.exit(1);
+  const maxAttempts = 10;
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      await connectDB();
+      app.listen(PORT, () => {
+        console.log(`TaskFlow server running on port ${PORT}`);
+      });
+      return;
+    } catch (error) {
+      console.error(
+        `Attempt ${attempt}/${maxAttempts} - Failed to start server: ${error.message}`
+      );
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+    }
   }
+  console.error('Could not connect to MongoDB after multiple attempts');
+  process.exit(1);
 };
 
 start();
