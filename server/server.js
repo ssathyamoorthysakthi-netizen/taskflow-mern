@@ -18,7 +18,7 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.get('/api', (req, res) => {
+app.get('/', (req, res) => {
   res.json({ message: 'Welcome to TaskFlow API', version: '1.0.0' });
 });
 
