@@ -26,6 +26,16 @@ const errorHandler = (err, req, res, next) => {
       .join(', ');
   }
 
+  if (err.name === 'MongooseServerSelectionError') {
+    statusCode = 503;
+    message = 'Database connection error, please try again later';
+  }
+
+  if (err.name === 'MongoNetworkError' || err.name.includes('Mongo')) {
+    statusCode = 503;
+    message = 'Database connection error, please try again later';
+  }
+
   console.error(err);
   res.status(statusCode).json({ message: message || 'Server Error' });
 };
