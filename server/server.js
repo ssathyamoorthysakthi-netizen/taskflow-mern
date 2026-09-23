@@ -12,7 +12,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: process.env.CLIENT_URL ? process.env.CLIENT_URL.split(',').map((o) => o.trim()) : true,
+    origin: (origin, cb) => cb(null, true),
   })
 );
 app.use(express.json());
