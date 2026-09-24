@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Users, Search, Eye, Pencil, Trash2, Loader2, Save, Mail, CalendarDays, Layers } from 'lucide-react';
+import { Users, Search, Eye, Pencil, Trash2, Loader2, Save, Mail, CalendarDays, Layers, UserPlus } from 'lucide-react';
 import { adminService } from '../../services/apiService';
 import { getErrorMessage, showToast } from '../../utils/helpers';
 import PageHeader from '../../components/ui/PageHeader';
@@ -24,6 +24,9 @@ export default function AdminUsers() {
   const [editForm, setEditForm] = useState({ name: '', role: 'user' });
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
+  const [createOpen, setCreateOpen] = useState(false);
+  const [createForm, setCreateForm] = useState({ name: '', email: '', password: '', confirmPassword: '', role: 'user' });
+  const [createLoading, setCreateLoading] = useState(false);
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -90,6 +93,38 @@ export default function AdminUsers() {
     }
   };
 
+  const handleCreateSubmit = async (e) => {
+    e.preventDefault();
+    if (createForm.name.trim().length < 2) {
+      showToast.error('Name must be at least 2 characters');
+      return;
+    }
+    if (!/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(createForm.email)) {
+      showToast.error('Please provide a valid email address');
+      return;
+    }
+    if (createForm.password.length < 6) {
+      showToast.error('Password must be at least 6 characters');
+      return;
+    }
+    if (createForm.password !== createForm.confirmPassword) {
+      showToast.error('Passwords do not match');
+      return;
+    }
+    setCreateLoading(true);
+    try {
+      await adminService.createUser(createForm);
+      showToast.success('User created successfully');
+      setCreateOpen(false);
+      setCreateForm({ name: '', email: '', password: '', confirmPassword: '', role: 'user' });
+      fetchUsers();
+    } catch (err) {
+      showToast.error(getErrorMessage(err));
+    } finally {
+      setCreateLoading(false);
+    }
+  };
+
   const roleBadge = (role) =>
     role === 'admin'
       ? 'bg-primary-100 text-primary-700 dark:bg-primary-900/40 dark:text-primary-200'
@@ -108,6 +143,11 @@ export default function AdminUsers() {
       <PageHeader
         title="User Management"
         subtitle={`${pagination.total} registered user${pagination.total === 1 ? '' : 's'}`}
+        actions={
+          <button onClick={() => setCreateOpen(true)} className="btn-primary">
+            <UserPlus className="h-4 w-4" /> Create User
+          </button>
+        }
       />
 
       <form
@@ -227,6 +267,65 @@ export default function AdminUsers() {
             </div>
           </div>
         )}
+      </Modal>
+
+      <Modal open={createOpen} onClose={() => setCreateOpen(false)} title="Create User">
+        <form onSubmit={handleCreateSubmit} className="space-y-4">
+          <div>
+            <label className="label-field">Name</label>
+            <input
+              value={createForm.name}
+              onChange={(e) => setCreateForm((prev) => ({ ...prev, name: e.target.value }))}
+              className="input-field"
+              placeholder="e.g. Jane Doe"
+            />
+          </div>
+          <div>
+            <label className="label-field">Email</label>
+            <input
+              type="email"
+              value={createForm.email}
+              onChange={(e) => setCreateForm((prev) => ({ ...prev, email: e.target.value }))}
+              className="input-field"
+              placeholder="jane@example.com"
+            />
+          </div>
+          <div>
+            <label className="label-field">Password</label>
+            <input
+              type="password"
+              value={createForm.password}
+              onChange={(e) => setCreateForm((prev) => ({ ...prev, password: e.target.value }))}
+              className="input-field"
+              placeholder="At least 6 characters"
+            />
+          </div>
+          <div>
+            <label className="label-field">Confirm Password</label>
+            <input
+              type="password"
+              value={createForm.confirmPassword}
+              onChange={(e) => setCreateForm((prev) => ({ ...prev, confirmPassword: e.target.value }))}
+              className="input-field"
+              placeholder="Re-enter password"
+            />
+          </div>
+          <div>
+            <label className="label-field">Role</label>
+            <select
+              value={createForm.role}
+              onChange={(e) => setCreateForm((prev) => ({ ...prev, role: e.target.value }))}
+              className="input-field"
+            >
+              <option value="user">User</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+          <button type="submit" className="btn-primary w-full" disabled={createLoading}>
+            {createLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <UserPlus className="h-4 w-4" />}
+            Create User
+          </button>
+        </form>
       </Modal>
 
       <Modal open={!!editUser} onClose={() => setEditUser(null)} title="Edit User">

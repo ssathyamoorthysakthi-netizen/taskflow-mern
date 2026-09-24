@@ -5,14 +5,11 @@ import Spinner from './components/ui/Spinner';
 import ProtectedRoute from './components/layout/ProtectedRoute';
 
 import Login from './pages/auth/Login';
-import Register from './pages/auth/Register';
 import NotFound from './pages/NotFound';
 
 import UserLayout from './layouts/UserLayout';
 import UserDashboard from './pages/user/UserDashboard';
 import MyTasks from './pages/user/MyTasks';
-import AddTask from './pages/user/AddTask';
-import EditTask from './pages/user/EditTask';
 import FilterTasks from './pages/user/FilterTasks';
 import Profile from './pages/Profile';
 
@@ -41,14 +38,11 @@ export default function App() {
     <Routes>
       <Route path="/" element={<HomeRedirect />} />
       <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
 
       <Route element={<ProtectedRoute />}>
         <Route path="/" element={<UserLayout />}>
           <Route path="dashboard" element={<UserDashboard />} />
           <Route path="my-tasks" element={<MyTasks />} />
-          <Route path="add-task" element={<AddTask />} />
-          <Route path="edit-task/:id" element={<EditTask />} />
           <Route path="filter-tasks" element={<FilterTasks />} />
           <Route path="profile" element={<Profile />} />
         </Route>

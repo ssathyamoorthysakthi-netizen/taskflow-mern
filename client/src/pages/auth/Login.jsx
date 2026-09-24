@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { CheckSquare, Lock, Mail, Loader2, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { getErrorMessage } from '../../utils/helpers';
@@ -105,17 +105,10 @@ export default function Login() {
               {loading ? 'Signing in...' : 'Sign In'}
             </button>
           </form>
-
-          <p className="mt-6 text-center text-sm text-gray-500 dark:text-gray-400">
-            Don&apos;t have an account?{' '}
-            <Link to="/register" className="font-semibold text-primary-600 hover:text-primary-700 dark:text-primary-400">
-              Register
-            </Link>
-          </p>
         </div>
 
         <p className="mt-6 text-center text-xs text-gray-400 dark:text-gray-600">
-          Demo: admin@taskflow.com / admin123 · demo@taskflow.com / demo123
+          Accounts are provisioned by your administrator
         </p>
       </div>
     </div>

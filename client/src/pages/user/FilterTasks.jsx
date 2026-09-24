@@ -1,13 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { ListTodo, PlusCircle, Search, SlidersHorizontal, RotateCcw } from 'lucide-react';
+import { ListTodo, Search, SlidersHorizontal, RotateCcw } from 'lucide-react';
 import { useTasks } from '../../hooks/useTasks';
-import { taskService } from '../../services/apiService';
-import { getErrorMessage, showToast } from '../../utils/helpers';
 import { CATEGORIES, PRIORITIES, STATUSES } from '../../utils/constants';
 import TaskCard from '../../components/tasks/TaskCard';
 import TaskDetail from '../../components/tasks/TaskDetail';
-import ConfirmDialog from '../../components/ui/ConfirmDialog';
 import Pagination from '../../components/ui/Pagination';
 import EmptyState from '../../components/ui/EmptyState';
 import PageHeader from '../../components/ui/PageHeader';
@@ -16,13 +12,10 @@ import Spinner from '../../components/ui/Spinner';
 const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 
 export default function FilterTasks() {
-  const { tasks, pagination, loading, setParams, refetch } = useTasks({ limit: 9 });
+  const { tasks, pagination, loading, setParams } = useTasks({ limit: 9 });
   const [filters, setFilters] = useState({ search: '', status: '', priority: '', category: '', dueDate: '', sort: '' });
   const [viewTask, setViewTask] = useState(null);
-  const [deleteTask, setDeleteTask] = useState(null);
-  const [actionLoading, setActionLoading] = useState(false);
   const [applied, setApplied] = useState(false);
-  const navigate = useNavigate();
 
   const updateFilters = (patch) => setFilters((prev) => ({ ...prev, ...patch }));
 
@@ -50,30 +43,6 @@ export default function FilterTasks() {
   }, [setParams]);
 
   const hasFilters = applied && (filters.search || filters.status || filters.priority || filters.category || filters.dueDate);
-
-  const handleStatusChange = async (id, status) => {
-    try {
-      await taskService.updateTask(id, { status });
-      showToast.success('Status updated');
-      refetch();
-    } catch (err) {
-      showToast.error(getErrorMessage(err));
-    }
-  };
-
-  const handleDelete = async () => {
-    setActionLoading(true);
-    try {
-      await taskService.deleteTask(deleteTask._id);
-      showToast.success('Task deleted');
-      setDeleteTask(null);
-      refetch();
-    } catch (err) {
-      showToast.error(getErrorMessage(err));
-    } finally {
-      setActionLoading(false);
-    }
-  };
 
   const inputClass = 'input-field';
   const labelClass = 'label-field';
@@ -183,13 +152,6 @@ export default function FilterTasks() {
               ? 'Try adjusting your search terms or clearing some filters.'
               : 'Apply filters above to narrow down your tasks.'
           }
-          action={
-            !hasFilters && (
-              <Link to="/add-task" className="btn-primary">
-                <PlusCircle className="h-4 w-4" /> Add Task
-              </Link>
-            )
-          }
         />
       ) : (
         <>
@@ -202,9 +164,6 @@ export default function FilterTasks() {
                 key={task._id}
                 task={task}
                 onView={setViewTask}
-                onEdit={(t) => navigate(`/edit-task/${t._id}`)}
-                onDelete={setDeleteTask}
-                onChangeStatus={handleStatusChange}
               />
             ))}
           </div>
@@ -220,14 +179,6 @@ export default function FilterTasks() {
       )}
 
       <TaskDetail task={viewTask} open={!!viewTask} onClose={() => setViewTask(null)} />
-      <ConfirmDialog
-        open={!!deleteTask}
-        title="Delete task"
-        message={`Are you sure you want to delete "${deleteTask?.title}"? This action cannot be undone.`}
-        onConfirm={handleDelete}
-        onCancel={() => setDeleteTask(null)}
-        loading={actionLoading}
-      />
     </div>
   );
 }

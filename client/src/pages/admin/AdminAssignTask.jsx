@@ -64,7 +64,7 @@ export default function AdminAssignTask() {
           <Users2 className="mx-auto h-10 w-10 text-gray-400" />
           <h3 className="mt-3 text-base font-semibold text-gray-800 dark:text-gray-100">No regular users yet</h3>
           <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            Register a user account first, then come back to assign a task.
+            Create a user account first from Admin → Users, then come back to assign a task.
           </p>
         </div>
       </div>

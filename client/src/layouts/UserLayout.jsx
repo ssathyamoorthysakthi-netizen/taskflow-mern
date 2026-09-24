@@ -1,4 +1,4 @@
-import { LayoutDashboard, ListTodo, PlusCircle, Filter, UserCircle, LogOut } from 'lucide-react';
+import { LayoutDashboard, ListTodo, Filter, UserCircle, LogOut } from 'lucide-react';
 import AppShell from '../components/layout/AppShell';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -17,7 +17,6 @@ export default function UserLayout() {
   const items = [
     { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, end: true },
     { to: '/my-tasks', label: 'My Tasks', icon: ListTodo },
-    { to: '/add-task', label: 'Add Task', icon: PlusCircle },
     { to: '/filter-tasks', label: 'Filter Tasks', icon: Filter },
     { to: '/profile', label: 'Profile', icon: UserCircle },
     { to: '#', label: 'Logout', icon: LogOut, action: handleLogout },

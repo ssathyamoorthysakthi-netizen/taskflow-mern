@@ -1,24 +1,17 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { ListTodo, PlusCircle, Search, ArrowUpDown } from 'lucide-react';
+import { ListTodo, Search, ArrowUpDown } from 'lucide-react';
 import { useTasks } from '../../hooks/useTasks';
-import { taskService } from '../../services/apiService';
-import { getErrorMessage, showToast } from '../../utils/helpers';
 import TaskCard from '../../components/tasks/TaskCard';
 import TaskDetail from '../../components/tasks/TaskDetail';
-import ConfirmDialog from '../../components/ui/ConfirmDialog';
 import Pagination from '../../components/ui/Pagination';
 import EmptyState from '../../components/ui/EmptyState';
 import PageHeader from '../../components/ui/PageHeader';
 import Spinner from '../../components/ui/Spinner';
 
 export default function MyTasks() {
-  const { tasks, pagination, loading, setParams, refetch } = useTasks({ limit: 9 });
+  const { tasks, pagination, loading, setParams } = useTasks({ limit: 9 });
   const [search, setSearch] = useState('');
   const [viewTask, setViewTask] = useState(null);
-  const [deleteTask, setDeleteTask] = useState(null);
-  const [actionLoading, setActionLoading] = useState(false);
-  const navigate = useNavigate();
 
   const handleSearch = (value) => {
     setSearch(value);
@@ -29,40 +22,11 @@ export default function MyTasks() {
     setParams((prev) => ({ ...prev, sort: e.target.value || undefined, page: 1 }));
   };
 
-  const handleStatusChange = async (id, status) => {
-    try {
-      await taskService.updateTask(id, { status });
-      showToast.success('Status updated');
-      refetch();
-    } catch (err) {
-      showToast.error(getErrorMessage(err));
-    }
-  };
-
-  const handleDelete = async () => {
-    setActionLoading(true);
-    try {
-      await taskService.deleteTask(deleteTask._id);
-      showToast.success('Task deleted');
-      setDeleteTask(null);
-      refetch();
-    } catch (err) {
-      showToast.error(getErrorMessage(err));
-    } finally {
-      setActionLoading(false);
-    }
-  };
-
   return (
     <div>
       <PageHeader
         title="My Tasks"
         subtitle={`You have ${pagination.total} task${pagination.total === 1 ? '' : 's'} in total`}
-        actions={
-          <Link to="/add-task" className="btn-primary">
-            <PlusCircle className="h-4 w-4" /> Add Task
-          </Link>
-        }
       />
 
       <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -97,14 +61,7 @@ export default function MyTasks() {
           message={
             search
               ? 'Try adjusting your search or clear the filters.'
-              : 'You have no tasks yet. Create your first task to get started.'
-          }
-          action={
-            !search && (
-              <Link to="/add-task" className="btn-primary">
-                <PlusCircle className="h-4 w-4" /> Add Task
-              </Link>
-            )
+              : 'You have no assigned tasks yet.'
           }
         />
       ) : (
@@ -115,9 +72,6 @@ export default function MyTasks() {
                 key={task._id}
                 task={task}
                 onView={setViewTask}
-                onEdit={(t) => navigate(`/edit-task/${t._id}`)}
-                onDelete={setDeleteTask}
-                onChangeStatus={handleStatusChange}
               />
             ))}
           </div>
@@ -133,14 +87,6 @@ export default function MyTasks() {
       )}
 
       <TaskDetail task={viewTask} open={!!viewTask} onClose={() => setViewTask(null)} />
-      <ConfirmDialog
-        open={!!deleteTask}
-        title="Delete task"
-        message={`Are you sure you want to delete "${deleteTask?.title}"? This action cannot be undone.`}
-        onConfirm={handleDelete}
-        onCancel={() => setDeleteTask(null)}
-        loading={actionLoading}
-      />
     </div>
   );
 }

@@ -49,6 +49,50 @@ const getUsers = async (req, res) => {
 };
 
 /**
+ * @desc   Create a new user (admin)
+ * @route  POST /api/admin/users
+ * @access Private/Admin
+ */
+const createUser = async (req, res) => {
+  const { name, email, password, confirmPassword, role } = req.body;
+
+  if (!validators.isName(name)) {
+    return res.status(400).json({ message: 'Name must be at least 2 characters' });
+  }
+  if (!validators.isEmail(email)) {
+    return res.status(400).json({ message: 'Please provide a valid email address' });
+  }
+  if (!validators.isPassword(password)) {
+    return res.status(400).json({ message: 'Password must be at least 6 characters' });
+  }
+  if (password !== confirmPassword) {
+    return res.status(400).json({ message: 'Passwords do not match' });
+  }
+
+  const userExists = await User.findOne({ email: email.toLowerCase() });
+  if (userExists) {
+    return res.status(400).json({ message: 'An account with this email already exists' });
+  }
+
+  const user = await User.create({
+    name,
+    email,
+    password,
+    role: role === 'admin' ? 'admin' : 'user',
+  });
+
+  res.status(201).json({
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    profileImage: user.profileImage,
+    createdAt: user.createdAt,
+    message: 'User created successfully',
+  });
+};
+
+/**
  * @desc   Update a user (name, role)
  * @route  PUT /api/admin/users/:id
  * @access Private/Admin
@@ -231,6 +275,7 @@ const getAdminStats = async (req, res) => {
 
 module.exports = {
   getUsers,
+  createUser,
   updateUser,
   deleteUser,
   getAdminTasks,

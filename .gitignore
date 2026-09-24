@@ -37,3 +37,6 @@ Thumbs.db
 
 # Database seed state
 tmp/
+server/launch.json
+.vercel
+.env*

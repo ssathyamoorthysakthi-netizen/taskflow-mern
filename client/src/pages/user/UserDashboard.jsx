@@ -7,7 +7,6 @@ import {
   CheckCircle2,
   AlertTriangle,
   Flag,
-  PlusCircle,
   ArrowRight,
   Layers,
 } from 'lucide-react';
@@ -63,11 +62,6 @@ export default function UserDashboard() {
       <PageHeader
         title="Dashboard"
         subtitle="Here's an overview of your tasks"
-        actions={
-          <Link to="/add-task" className="btn-primary">
-            <PlusCircle className="h-4 w-4" /> New Task
-          </Link>
-        }
       />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
@@ -97,12 +91,7 @@ export default function UserDashboard() {
             <EmptyState
               icon={ListTodo}
               title="No tasks yet"
-              message="Create your first task to get started."
-              action={
-                <Link to="/add-task" className="btn-primary">
-                  <PlusCircle className="h-4 w-4" /> Add Task
-                </Link>
-              }
+              message="Your assigned tasks will appear here."
             />
           ) : (
             <div className="overflow-x-auto">

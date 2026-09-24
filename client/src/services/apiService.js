@@ -18,6 +18,7 @@ export const taskService = {
 
 export const adminService = {
   getUsers: (params) => api.get('/admin/users', { params }),
+  createUser: (data) => api.post('/admin/users', data),
   updateUser: (id, data) => api.put(`/admin/users/${id}`, data),
   deleteUser: (id) => api.delete(`/admin/users/${id}`),
   getTasks: (params) => api.get('/admin/tasks', { params }),
